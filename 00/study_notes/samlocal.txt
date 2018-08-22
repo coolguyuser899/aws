@@ -1,0 +1,49 @@
+29 July 2018
+
+
+# install docker 
+brew cask install docker
+
+
+# install go 
+brew update
+brew install golang
+go version
+
+# build from source, error from pip install Command "python setup.py egg_info" failed with error code 1 in /Users/TheFijiMonster/Documents/aws/samlocal/aws-sam-cli/
+
+git clone https://github.com/awslabs/aws-sam-cli.git
+
+
+#change below 2 lines and remove after ;
+aws-sam-cli/requirements/dev.txt 
+
+#pathlib2==2.3.2; python_version<"3.4"
+#futures==3.2.0; python_version<"3.2.3"
+pathlib2==2.3.2
+futures==3.2.0
+
+# change base.txt remove 
+pathlib2==2.3.2
+futures==3.2.0
+
+# install from source after above removal
+pip install --user -e . --verbose
+
+sam --version
+SAM CLI, version 0.5.0
+
+# on console enable experimental feature kubernetes
+
+## steps to run sam
+
+#start docker
+ps -ef |grep docker
+
+# download example 
+git clone https://github.com/awslabs/serverless-application-model.git
+
+cd serverless-application-model/examples/apps/hello-world
+
+sam local start-api
+

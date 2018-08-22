@@ -1,0 +1,543 @@
+aws solutions architecture associated - release feb 2018
+
+# exam guide
+https://d1.awsstatic.com/training-and-certification/docs-sa-assoc/AWS_Certified_Solutions_Architect_Associate_Feb_2018_%20Exam_Guide_v1.5.2.pdf
+
+# white papers listed on exam guide
+AWS Whitepapers (aws.amazon.com/whitepapers) Kindle and .pdf and Other Materials
+Architecting for the Cloud: AWS Best Practices whitepaper, Feb 2016
+https://d0.awsstatic.com/whitepapers/AWS_Cloud_Best_Practices.pdf
+
+AWS Well-Architected web page (various whitepapers linked)
+https://aws.amazon.com/architecture/well-architected/
+
+# 8 as of 11 august 2018
+AWS Well-Architected Framework whitepaper
+Operational Excellence whitepaper
+Security Pillar whitepaper
+Reliability Pillar whitepaper
+Performance Efficiency whitepaper
+Cost Optimization whitepaper
+serverless application lens whitepaper 
+HPC lens whitepaper
+
+Let's study them.
+
+How to disable local root access?
+A: sudo passwd -l root
+
+What does this do?
+sudo shred -u etc/ssh/*_key /etc/ssh/*_key.pub 
+A: remove existing ssh host key pairs to reduce likelihood of "man-in-the-middle" attacks.
+
+what is cloud-init package?
+A: it can be used to inject public key credentials for a configured user.
+
+Is amazon devpay accepting new sellers or products?
+A: No, aws marketplace is not the single unified e-commerce platform for selling software and services.
+
+What is x.509 certificate used in ami?
+The x.509 certificate and private key are used to encrypt and decrypt ami.
+
+Can you convert instance store-backed linux and windows ami to ebs-backed ami?
+A: Yes for owned linux ami, not for windows ami.
+
+How aim ami with encrypted ebs snapshots is charged?
+A: You will incur storage costs for snapshots in both unencrypted and encrypted snapshots.
+
+What are you charged when copying an ami?
+A: you pay standard storage and data transfer rates, no chargs for copying an ami.
+
+When you first copy an instance store-backed ami to a region, what is created by aws?
+A: a s3 bucket.
+
+What command is used to stop ami copy operation?
+A: deregister-image
+
+What is command to terminate an ec2?
+A: aws ec2 terminate-instance --instance-ids instanc_id
+
+Which file identifies amazon linux images?
+a: /etc/image-identifies   # recommend use amzn2 
+
+How to config aws linux to download and install security updates at launch time.
+A: in cloud-init setting: user text data, repo_upgrade: security
+
+How to enable lock-on-launch in new instance?
+A: cloud-inig: repo_releaseever: 2017.09  (comment out releaseever=latest.)
+
+How user data script is executed?
+A: by /etc/init.d/cloud-init-user-scripts during first boot cycle.
+
+Can you use amazon linux 2 VM images for on premises dev and testing?
+A: yes, on vmware, kvm, virtual box (oracle vm), micrisoft hyver-v.
+
+What command do you use to find pv-grub kernal id?
+A: aws ec2 describe-instance-attribute --instance-id instance_id --attribute kernel --region region 
+
+What are different types of ec2?
+A: on-deman (default), spot, reserved.
+
+Which instances support 1500 MTU and/or 9001 MTU (jumbo frames)?
+A: All amazon ec2 supports v2 1500 mtu, all current generation support 9001 mtu.
+
+How many instance types?
+A: 
+89 - current generation :general purpose (25), compute optimized (16), memory optimized (32), storage optimized (15), accelerated computing (11).
+33 previous generation: general purpose (8), compute optimized (8), memory optimized (9), storage optimized (5), gpu optimied (2), micro (1)
+122 total 
+
+What is not available for t2 instances?
+A: t2 instance availalbe as on demand, reserved, spot, not available as scheduled, dedicated, neither dedicated host.
+
+What is the limit you can run t2 instance simultaneously?
+A: 20 t2.
+
+What happens to cpu credits when an instance is stopped?
+A: cpu credits on a running instance do not expire, but instance loses all accrued credit when stopped.
+
+What does Elastic Network Adapter (ENA) do?
+A: ENA can deliver high packet per second support 10 GBps or 25 GBps.
+
+Why the IOPS can decrease when ssd-based instance store volumes is filled?
+A: due to extra work ssd controller must do to find available space, read surrounding data and store in new location, or write amplification.
+
+How ssd controller can reduce impact of write amplification.
+A:  By over-provisioning 10% of volume unpartitioned.
+
+What is NVme?
+A: Non-Volatile Memory Express to access non-volatile storage media attached via a pCI express.
+
+What cluster placement group do?
+A: it provides low latency and high bandwidth connectivity between instances with single az.
+
+What is linux here document?
+A: it is a section of source code which is treated as a separate file
+cat << EOF | sudo tee --append /etc/modprobe.d/blacklist.config
+blacklist vga16fb
+blacklist nouveau
+EOF
+
+How long a storage optimized instance i3.metal boot time can take?
+A: with freebsd ami,i3.metal instance can take nearly an hour to boot and i/o to the local nvme storage does not complete.
+
+What is instance over-utilized and under-utilized?
+A: over-utilized is instance type is too small, under-utilized is tehe instanc type is too large.
+
+What is instance resizing?
+A: change teh size of the instance type and size for ebs volume backed instance.
+
+What happens when a ebs backed instance resizing occurrs?
+A: move to new hardware, new public IPv4 address, disassociate EIP.
+
+What are ec2 instance purchasing options?
+A: 
+on-demand instance: pay by second.
+reserved instances: significant discount, always available, one to three years.
+scheduled instances: available on recurring schedule for one year term.
+spot instances: lower cost significantly
+decicated hosts: for per-socket,per-core, per-vm software licenses to reduce cost.
+dedicated instances: pay by hour for instances run on single tenant hardware.
+
+When scheduled instance is terminated?
+A: terminates 3 minutes before the time period ends.
+
+How a year and 3 year is defied?
+A: a year = 31536000 seconds (365 days)
+3 year = 94608000 seconds (1095 days)
+
+What can you do after you purchase reserved instance? 
+A: you can't cancel, you can modify, exchange, or sell.
+
+What is a regional reserved instance?
+A: When you purchase a reserved instance for a region.
+
+What are differences between standard reserved instance and convertible reserved instance?
+A: convertible can't be sold, can exchange, standard reserved instance type can't be modified.
+
+What is ec2 instance normalization factor?
+A: it is used to apply discount rate of reserved instances, either fully or partially running.
+
+How to calculate reserved instance priciing discounts?
+A: list value = fixed price + (undiscounted recurring hourly price * hours in term)
+
+After you purchase a reserved instance, can you cancel it?
+A: No.
+
+What reserved instance size footprint can be used?
+A: to combine or divide instance type in same footprint configuration.
+
+Can you stop or reboot scheduled instances?
+A: no, you can only terminate manually.
+
+What is the instance limit for scheduled instances?
+A: minimum 1200 hours per year
+
+What is a spot fleet?
+A: it is a collection, of fleet, of spot instances, and optionally on demand instances.
+
+What command to use to create spot instance fleet?
+A: aws ec2 request-spot-fleet --spot-fleet-request-config file://config.json
+
+How many days can you see in spot price history?
+A: 90 days.
+
+How auto scaling calculate capacity when you have a floatin-point number?
+A: round up, 29.1 round up to 30.
+
+What is cooldown perild?
+A: the number of seconds after a scaling activity completes where previous trigger-related scaling activities can influence future scaling events.
+
+What are two types of ec2 scaling?
+A: target tracking scaling (like home thermostat) and step scaling (based on size of alarm breach)
+
+What is recommended time to check spot instance interruption warning?
+A: user to check every 5 seconds (2 minute warning from aws)
+
+What is dedicated host affinity?
+A: if "Host" is selected, the instance always restarts on this specific host.
+
+What are ec2 ternnancy?
+A: default (shared hw), dedicated (single-tenant hw), host (isolated server)
+
+At what instance state when instance usage is billed ?
+A: running only (the instance is running and ready for use), with one minute minimum.
+Note: when rebooting instance stays in running state, does not start new billing period.
+
+What does ami provide?
+A: it provides the operation system, application server, applications for your instance.
+
+Is it possible to break up large requests into small batches for faster launch ?
+A: yes (e.g. create five separate launch requests for 100 instance instead one launch for 500 instances)
+
+What happens if you choose Proceed without key pair?
+A: won't be able to connect to the instance, unless ami is configured to allow user another way to login.
+
+Do you pay for using ec2 fleet?
+A: no, you pay only for the ec2 instances.
+
+How often does ec2 fleet health checks instance fleet?
+A: every two minutes.
+
+What is WSL windows subsystem for linux?
+A to run native linux command line tool directly on windows.
+
+What cmd aws ec2 get-console-output --instance-id instance_id do?
+A: you can use it to check RSA fingerprint and compare it to that of instance.
+
+What error do you get when you modify running instance type, user data, kernel, or ram disk?
+A: IncorrectInstanceState error.
+
+Wbat is a screen session?
+A: it allows you to continue running the update even if your connectoin is interrupted on instance.
+screen;   screen -ls;    screen -r process_id
+
+What are processor state you can control in ec2 instance?
+A: c-state (core, idle power saving state), p state(execution power saving state)
+
+Why/when do you want to disable deeper c-state for high performance and low latency?
+A: it takes time for speeping core to wake up and perform task, common scenario for disabling deeper sleep states is a redis db application, for fatest query response time.
+
+What is the amazon time sync service ip address?
+A: 169.254.169.123, for any instance running in vpc.
+
+What two types of user data you can pass to ec2?
+A: shell scripts and cloud-init directives (run durning the first boot cycle)
+
+What is the first line at the top of cloud-init directives?
+A: #cloud-config
+
+what is instance metadata?
+A: data about instance to use to configure or manage the running instance.
+http://169.254.169.254/latest/meta-data
+
+What are types of ec2 status check?
+A: system status check (loss of network, power, sw/hw issue), instance status check (wrong config, memory, file system, kernel)
+
+How long cloud data is recorded and how often?
+A: statistics are recorded for 15 months, default ec2 sends data to cloudwatch in 5 minutes.
+
+What is a key pair?
+A: public and private keys, public key to encrypt data, private key to decrypt data.
+
+What happens if you lose private key?
+A: for store-backed instance,you can't access, for ebs-backed linux instance, you can regain-access.
+
+What are default rules of security group user created?
+A: allows no inbound traffic, allows all outbound traffic.
+
+What are common db ports?
+A: 
+1433: mssql
+3306 mysql/aurora
+5439 redshift
+5432 postgresql
+1521 oracle 
+
+What permission is requried to allow user view elastic ip address?
+A: ec2:DescribeAddress
+
+What are ip address difference when used in ec2 access?
+0.0.0.0/0 - all ipv4 address, ::/0 all ipv6 address
+
+How long might it take for public ip address to propagate through the internet?
+A: up to 24 hours.
+
+What are network interface attach called at different instance state?
+A: instance running (hot attach), stopped (warm attach), being launched (cold attach)
+
+When do user want to disable source or destination check?
+A: when instance running nat, routing, or firewall, the default is enabled.
+
+What is instance placement group?
+A: it determines how instances are place on underlying hardware, you specify cluster (low latency in single az) or spread (across hardware)
+Placement group is free.
+
+What is a ebs volume?
+A: behaves like a raw, unformatted, external block device you can attach to single instance.
+
+What is gp2?
+A: general purpose ssd.
+
+What is max size ebs support now?
+A: 16 Tib
+
+What is amazon dlm?
+A: it is data lifecycle manager to automate the creation, retention, and deletion of snapshots of ebs.
+
+What s3 cmd can synchronize an entire s3 bucket to local directory?
+A: aws s3 sync s3://remote_s3_bucket  local_bucket
+
+What is ec2rescue?
+A: an easy to use open source tool to diagnose and troubleshoot issues on ec2. (ec2rl cmd)
+
+How to capture command line screenshot?
+A: get-console-screenshot
+
+####### ec2 auto scaling 
+What is auto scaling?
+A: it ensures that you have the correct number of amazon ec2 instances available to handle the load of your app.
+
+What are auto scaling component?
+A: groups (logic unit), launch configurations (ami id, type, key pair, sg, block device mapping) , scaling options (condition, schedule)
+
+In which state ec2 is counted against the desired capacity in auto scaling group?
+A: InService.
+
+Does elb recover unhealthy instance?
+A: no, it never automatically recovers its health.
+
+Can scale-in and scale-out run at same time?
+A: no, a scale-in can't start while a scale-out is in progress.
+
+What is simple scaling policy?
+A: after scaling activity started, policy must wait till health check or replacement completed.
+
+What is step scaling policy?
+A: after scaling activity started, the policy continues to respond to additional alarms, even health check or replacement is in progress.
+
+What two factors are used for sqs based scaling?
+A: Backlog per instance (number of messages from queue / number of instances) and acceptable backlog per instance (acceptable app queue processing latency / actual avg processing message time).
+
+What policies does scalingcooldowns support?
+A: only simple scalig policies, but not target tracking policies, step scaling policies, or scheduled scaling.
+
+What is scaling termination policy?
+A: Here is the order
+-most instances in az, when multiple select using the oldest launch configuration (OldestInstance, NewestIntance)
+-the closest to the next billing hour (ClosestToNextInstanceHour)
+-if same select one at random (Default)
+
+What is ec2 auto scaling lifecycle hooks?
+A: enable you to perform custom action by pausing instances as an auto scaling group launches or terminates, e.g. for software update.
+
+When do you put instance in standby mode?
+A: you can update or troubleshoot the instance, you are billed when instance in standby mode, this is to temporarily remove an instance from auto scaling group.
+
+What is difference between basic monitoring and detailed monitoring?
+A: 300 seconds for basic and 60 for detailed.
+
+What are 3 possible cloudwatch alarm values?
+A: ok (within range), alarm (out of range), insufficient_data (not enough data)
+
+#### AWS Application Discovery Service User Guide
+What is aws application discovery service?
+A: help migration to aws cloud by collecting usage and configuration data about on-premises servers.
+
+What are two types of discovery?
+A: Agentless discovery and agent-based discovery.
+
+How agentless discovery connector works?
+A: install discovery connector as vm in vmware vcenter using ova (open virtualization archive) file.
+
+What is application discovery service endpoint?
+A: https://arsenal.us-west-2.amazonaws.com/
+
+# ECR
+What is ecr?
+A: elastic container registry is docker registry service, developer can use to push, pull, and manage images.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

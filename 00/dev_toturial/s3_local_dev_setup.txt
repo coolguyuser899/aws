@@ -1,0 +1,13 @@
+
+
+import boto3
+
+s3client = boto3.client('s3', endpoint_url='http://0.0.0.0:4572/',
+        aws_access_key_id = 'AccessKey',
+        aws_secret_access_key = 'SecertKey')
+bucket_name = 'aaaaa'
+s3client.create_bucket(Bucket=bucket_name)
+
+# Print out bucket names
+#for bucket in s3client.buckets.all():
+#   print(bucket.name)

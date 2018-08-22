@@ -1,0 +1,398 @@
+aws educate free for student - https://aws.amazon.com/education/awseducate/
+
+
+exam test hands on experience on aws
+
+developer more focus on development, e.g. dynamo db, ec2, vpc, instance types (developer exam may ask)
+
+# create autoscaling launch configuration
+aws autoscaling create-launch-configuration --launch-configuration-name reinventLC --instance-type m1.xlarge --image-id ami-853556c --user-data file://users/userdata.txt --key-name aws_reinvent
+# 
+aws autoscaling create-auto-scaling-group --auto-scaling-group-name reinventASG --launch-configuration-name reinvent --in-size 5 --max-size 20 --availability-zonesus-east-1b
+
+aws autoscaling put-scaling-policy --policy-name Add10Instances --scaling-adjustment 1- --adjustment-type ChangeInCapacity --auto-scaling-group-name reinventasg
+
+steps to deploy java / quque / dynamodb / sqs 
+create queuee
+upload application to s3: java jar
+create ami with jre image:
+create bootstrap script: userdata.txt
+create launch configuration
+create autoscaling group
+create alarm threshold and linked to asg
+launch it
+
+userdata.txt
+#!/bin/bash
+
+cd /home/ec2-user
+wget https://s3-sa-east-1.amazonaws.com/user/processor.jar
+
+export QUEUE_NAME=VOTES
+jar -jar -DentityExpansionLimit=0 /home/ec2-user/processor.jar > /home/ec2-user/processor.log
+
+
+
+
+what is not available via standard cloudwatch metric?
+memory utilization
+
+what could be potential cause of exception in dymamo db after increase traffic?
+reads and writes exceeding provisioned throughput of table
+
+which architecture scale out during peak demand with cost optimozed solution
+add static in cloudfront and s3, config auto scaling to add instance as traffic increases, config launch configuration with ami having web application
+
+how many rules can a CORS configuration have?
+100
+
+how to improve s3 performance?
+prefix key name with hash of key name or reverse to introduce randomness in key name prefix
+
+what 400-series and 500-series error code indicates?
+400 you can't perform operation (bucket already exists, invalid bucket name, must be handled by user)
+500 you may retry (internal error, slowdown)
+503 error code must be resolved by aws
+
+what does s3 access log include?
+requester, bucket name, request time, request action, response status, error code
+
+what is needed to allow private instance access internet via NAT instance?
+disable source / destination check in NAT instance (at action menu / networking / change s/d check)
+
+Can route 53 CNAME record point to any DNS record hosted anywhere?
+yes
+
+What is route 53 apex zone?
+
+Which service is at global level?
+iam 
+
+which service can store user session with high durability and low latency?
+dynamo db (elastic cache has low latency)
+
+what servcie you use to have dedicated to extend on premise data center to aws?
+direct connect (VPC virtual private gateway routes throught internet)
+
+which services can be used to store session data?
+elastic cache, dynamodb, rds
+
+who is responble for decommissioning storage device using industry standard?
+aws (data replication across regions must be done by customer)
+
+what happens when an ec2 instance i sstopped?
+all data on instance-store devices will be lost.
+
+what is best way to issue api calls from an ec2 instance?
+ensure the ec2 uses an iam role.
+
+what does cloudfront use to deliver content to users?
+edge location
+
+what is required to extend on premise infrastructure to aws via vpn using virtual private gateway?
+an static and routable ip address as customer gateway
+
+
+what can be used to make sure auto scaling instances are created in the right pace?
+ensure the correct cool down period is set at auto scaling
+
+what can be used in EMR to reduce job time?
+reduce file size and use more mapper tasks simultaneously
+
+how to limite video file source access throught cloud front only but not s3 url?
+use cloud front origin identity and only grant access to that identity to the video in s3
+
+what is elastic ip limit per region?
+5
+
+in iam what are access keys which can be granted to a user?
+access key id and secret access key (create access key button)
+
+what are aws support plan?
+basic, developer, business, enterprise
+
+what can a new iam user use java sdk to work with aws resource?
+access keys
+
+what do you create for new iam user who want to use aws console to work with resources?
+password and user id
+
+which has stateless in nature in vpc?
+network access control list  (security group is stateful)
+
+does elastic beanstalk provide underlying access to ec2?
+yes, under configuration / instances / ec2 key pair 
+(no underlying ec2 access in elb, rds, elastic cache are services managed by aws)
+
+does emr provide underlying access to ec2?
+yes
+
+
+what must you do to allow clients on internet to connect new app listening on a custom port on ec2 instance?
+make change to the security group (security group innbound rule)
+
+regard to aws import/export/snowball service, which is false?
+data can be imported into s3, glacier, ebs
+data can be exported from s3
+data can not be exported from glacier
+
+what types does storage gateway volumes have?
+gateway cached volumes, gateway stored volumes, gateway virtual tape library
+
+what can be used to keep cost minimal after use uploaded an image for processing, download only once, and never download again?
+store images in s3 rrs, then use lifecycle policies to delete the image
+
+what are valid sns subscriber?
+http, email, sqs, lamda, application, sms (defined at protocol when create sns  (not swf)
+
+which service can track all changes in aws?
+cloudtrail
+
+how can you ensure ec2 instances have the least network latency?
+place in ec2 placement group in same az (not all instance type support it)
+
+when should you enable encryption for an ebs volumes?
+at time of creation of the ebs volumes
+
+after s3 upload is successful what is http code returned?
+200
+
+is s3 a durable key value store?
+yes
+
+what is required for hybrid cloud vpn connection?
+customer gateway and a public ip address assigned to the virtual private gateway in aws
+
+what s3 type can be used to keep minimul cost?
+s3 rrs reduced redundancy storage (RRS)
+
+what ec2 must have in order to have public internet access?
+public ip, elastic ip address
+
+which aws services allows you to work with chef?
+opsworks
+
+what can you use to support complex queries and table joins with high availablity?
+rds with multi az
+
+is ebs snapshots are automatically encrypted?
+yes
+
+what is true regarding encrypted ebs volumes?
+supported on all ebs volume types  (click volume create new volume, encryption check is available for all types)
+
+what is cost efficient and scalable way to store durable unprocessed and processed videos?
+s3
+
+what is needed for an off site backup and ability to access frequently accessed data?
+gateway cached volume
+
+what is secure way to use bastion host?
+deploy bastion in public subnet, ensure only administration machine IP can access to it
+
+what does below network address mean 12.34.56.78/32 ?
+single ip with network mask 32 means single address
+
+what could be reason network error, connection timed out in ec2?
+make sure private key file corresponding to aws ec2 key pair assigned at launch
+
+how do you point zone apex to load balancer?
+create an A record aliased to the LB dns name
+
+which instance type is available as ebs backed only?
+general purpose t3  (see instance type web page storage types at right)
+
+vpc peering connection is not transient, how can you connect vpc1, vpc2, vpc3?
+create peering connection 1-3 directly
+
+how to ensure cost optimization on eip?
+allocate the eip to a running instance.
+
+s3 specific, how do you monitor access to s3 bucket?
+enable server access logging for all buckets (s3 properties tab, logging)
+
+what is better way to upload 5 gb videoto s3?
+multipart file upload (for files >100mb)
+
+which access mechanism to use for mobile app users?
+saml - access aws console from on premise
+cross account access - access to another account
+web identity federation - for mobile app access 
+
+which service to use gps tracking system in real time?
+kinesis
+
+which category provided by trusted advisor?
+cost optimization, performance, security,  fault tolerance (not high availablity)
+
+how to re-use on premise active directory to access aws console?
+use aws directory service AD connector
+
+how to collect mysql rds read write iops and send alret?
+cloudwatch and sns
+
+relational database automatically support strong data consistency due to ACID properties
+
+nosql support horizontal scaling, you can store 10,000 users on each servers by partitioned
+nosql delivery high performance with eventual consistency
+dynamodb support document
+
+what data structures does dynamodb support?
+document and key-value data
+
+How many customers uses dynamoDB?
+100,000
+
+dynamodb concepts
+table
+item
+attribute
+partition or hash keys determines data distribution
+highly distributed hash key design is important
+hash range keys allows (composite primary key)
+1:N relationship
+enable righ query capabilities (all item, ==, <, >, begin with, between, count, top/bottom n values, paged response)
+dynamodb schema is defined at attribute level, RDS defined at table level
+gsi 1 table update = 0, 1, 2 gsi updates
+0=item not in index before and after update
+1=update introduces a new indexed-attribute, update deletes the indexed-attribute
+2=updated changes the value of an indexed attribute from A to B
+take advantage of sparse indexes (entry value is not contained in all items)
+provision enough throughput for gsi, one update to table may result two writes to an index
+ProvisionedThroughputExceededException (400) - consider increasing provisioning level for gsi with UpdateTable API
+An dynamodb item maximum size is 400 KB.
+eventual consistent read may return slightly stale data 
+strongly consistent read returns most up to date data
+dynamodb projects(copies) the specified attributes fromtableto the index.
+global secondary index because query can span all data in a table, across all partitions
+global table, replica table, one replica table per region,same name and primary key 
+global table uses last writer win reconciliation 
+create, update, delete, list table 
+query : 
+projection expression: subset of attributes must be returned
+consistent read: specify strongly consistent read or eventually consistent read
+filter expression: apply condition after read before returned to you
+a query operation is more efficient than a sacn operation (scan expensive)
+expression attribute name: start with #
+expression attribute value: start with :
+LastEvaluatedKey: when null no more result
+ExclusiveStartKey: used from previous request 
+GetItem 
+PutItem
+UpdateItem  (SET (add attributes), REMOVE, ADD (add an item), DELETE)
+DeleteItem 
+UpdateItem return values: NONE, ALL_OLD, UPDATE_OLD,ALL_NEW, UPDATED_NEW)
+DeleteItem: return values to ALL_OLD
+read-modify-write pattern, optimistic concurrency control: optimistic locking with version number only if item has not changed
+BatchGetItem: up to 16MB, up to 100 items, from multiple tables
+BatchWriteItem: up to 16 MB, 25 put or delete requests in multiple tables
+DAX dynamodb compatible caching service benefit from fast im-memory performance 
+dynamodb does not support cross item transactions
+BatchGetItem fail error: UnprocessedKeys
+BatchWriteItem fail error: UnprocessedItems
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

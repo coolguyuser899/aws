@@ -1,0 +1,14 @@
+1 terabyte  = about 1,000,000,000,000 bytes or 1,024 GB
+
+aws s3 name: [0-9a-zA-Z], !-_.*'/   allowed
+when use sdk to add metadata "x-amz-meta-"  is added automatically
+
+ml.aws  # aws machine learning
+solution builder   http://amzn.to/2nTVjcp
+
+s3 version id is null when version is disbled
+to support https access to bucket, avoid using period in bucket name
+s3 > 100mb, > 5 gb <= 5tb, use multipart upload
+single put up to 5 gb
+
+

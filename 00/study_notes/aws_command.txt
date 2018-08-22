@@ -1,0 +1,290 @@
+  aws help
+  aws <command> help
+  aws <command> <subcommand> help
+
+
+acm                                      | alexaforbusiness                        
+apigateway                               | application-autoscaling                 
+appstream                                | appsync                                 
+athena                                   | autoscaling                             
+batch                                    | budgets                                 
+ce                                       | cloud9                                  
+clouddirectory                           | cloudformation                          
+cloudfront                               | cloudhsm                                
+cloudhsmv2                               | cloudsearch                             
+cloudsearchdomain                        | cloudtrail                              
+cloudwatch                               | codebuild                               
+codecommit                               | codepipeline                            
+codestar                                 | cognito-identity                        
+cognito-idp                              | cognito-sync                            
+comprehend                               | cur                                     
+datapipeline                             | dax                                     
+devicefarm                               | directconnect                           
+discovery                                | dms                                     
+ds                                       | dynamodb                                
+dynamodbstreams                          | ec2                                     
+ecr                                      | ecs                                     
+efs                                      | elasticache                             
+elasticbeanstalk                         | elastictranscoder                       
+elb                                      | elbv2                                   
+emr                                      | es                                      
+events                                   | firehose                                
+gamelift                                 | glacier                                 
+glue                                     | greengrass                              
+guardduty                                | health                                  
+iam                                      | importexport                            
+inspector                                | iot                                     
+iot-data                                 | iot-jobs-data                           
+kinesis                                  | kinesis-video-archived-media            
+kinesis-video-media                      | kinesisanalytics                        
+kinesisvideo                             | kms                                     
+lambda                                   | lex-models                              
+lex-runtime                              | lightsail                               
+logs                                     | machinelearning                         
+marketplace-entitlement                  | marketplacecommerceanalytics            
+mediaconvert                             | medialive                               
+mediapackage                             | mediastore                              
+mediastore-data                          | meteringmarketplace                     
+mgh                                      | mobile                                  
+mq                                       | mturk                                   
+opsworks                                 | opsworkscm                              
+organizations                            | pinpoint                                
+polly                                    | pricing                                 
+rds                                      | redshift                                
+rekognition                              | resource-groups                         
+resourcegroupstaggingapi                 | route53                                 
+route53domains                           | sagemaker                               
+sagemaker-runtime                        | sdb                                     
+serverlessrepo                           | servicecatalog                          
+servicediscovery                         | ses                                     
+shield                                   | sms                                     
+snowball                                 | sns                                     
+sqs                                      | ssm                                     
+stepfunctions                            | storagegateway                          
+sts                                      | support                                 
+swf                                      | translate                               
+waf                                      | waf-regional                            
+workdocs                                 | workmail                                
+workspaces                               | xray                                    
+s3api                                    | s3                                      
+configure                                | deploy                                  
+configservice                            | opsworks-cm                             
+runtime.sagemaker                        | history                                 
+help
+acm                                      | alexaforbusiness                        
+apigateway                               | application-autoscaling                 
+appstream                                | appsync                                 
+athena                                   | autoscaling                             
+batch                                    | budgets                                 
+ce                                       | cloud9                                  
+clouddirectory                           | cloudformation                          
+cloudfront                               | cloudhsm                                
+cloudhsmv2                               | cloudsearch                             
+cloudsearchdomain                        | cloudtrail                              
+cloudwatch                               | codebuild                               
+codecommit                               | codepipeline                            
+codestar                                 | cognito-identity                        
+cognito-idp                              | cognito-sync                            
+comprehend                               | cur                                     
+datapipeline                             | dax                                     
+devicefarm                               | directconnect                           
+discovery                                | dms                                     
+ds                                       | dynamodb                                
+dynamodbstreams                          | ec2                                     
+ecr                                      | ecs                                     
+efs                                      | elasticache                             
+elasticbeanstalk                         | elastictranscoder                       
+elb                                      | elbv2                                   
+emr                                      | es                                      
+events                                   | firehose                                
+gamelift                                 | glacier                                 
+glue                                     | greengrass                              
+guardduty                                | health                                  
+iam                                      | importexport                            
+inspector                                | iot                                     
+iot-data                                 | iot-jobs-data                           
+kinesis                                  | kinesis-video-archived-media            
+kinesis-video-media                      | kinesisanalytics                        
+kinesisvideo                             | kms                                     
+lambda                                   | lex-models                              
+lex-runtime                              | lightsail                               
+logs                                     | machinelearning                         
+marketplace-entitlement                  | marketplacecommerceanalytics            
+mediaconvert                             | medialive                               
+mediapackage                             | mediastore                              
+mediastore-data                          | meteringmarketplace                     
+mgh                                      | mobile                                  
+mq                                       | mturk                                   
+opsworks                                 | opsworkscm                              
+organizations                            | pinpoint                                
+polly                                    | pricing                                 
+rds                                      | redshift                                
+rekognition                              | resource-groups                         
+resourcegroupstaggingapi                 | route53                                 
+route53domains                           | sagemaker                               
+sagemaker-runtime                        | sdb                                     
+serverlessrepo                           | servicecatalog                          
+servicediscovery                         | ses                                     
+shield                                   | sms                                     
+snowball                                 | sns                                     
+sqs                                      | ssm                                     
+stepfunctions                            | storagegateway                          
+sts                                      | support                                 
+swf                                      | translate                               
+waf                                      | waf-regional                            
+workdocs                                 | workmail                                
+workspaces                               | xray                                    
+s3api                                    | s3                                      
+configure                                | deploy                                  
+configservice                            | opsworks-cm                             
+runtime.sagemaker                        | history                                 
+help
+
+
+
+
+# aws commands from guide
+aws autoscaling set-instance-protection --instance0-ids i-5f2e8a0d --auto-scaling-group-name my-asg --protected-from-scale-in  #enable instance protection
+
+aws autoscaling set-instance-protection --instance-ids i-5f2e8a0d --auto-scaling-group-name my-asg --no-protected-from-scale-in
+
+# create cloudwatch event rule
+aws events put-rule --name my-rule --event-pattern file://pattern.json  --state ENABLED
+pattern.json for launch lifecycle
+{
+  "source": [ "aws.autoscaling"],
+  "detail-type": [ "EC2 Instance-launch Lifecycle Action" ]
+}
+# pattern for terminate lifecycle
+{
+  "source": [ "aws.autoscaling" ],
+  "detail-type": [ "EC2 Instance-terminate Lifecycle Action"]
+}
+
+# grant rule permission to invoke lambda
+aws lambda add-permission --function-name LogScheduledEvent --statement-id my-scheduled-event --action 'lambda:InvokeFunction' --principal events.amazonaws.com  --source-arn  arn:aws:events:us-east-1:123456789012:rule/my-scheduled-rule
+
+# create a target that invokes lambda
+aws events put-targets --rule my-rule --targets Id=1,Arn=arn:aws:lambda:us-west-2:123456789012:function:my-function
+
+aws autoscaling describe-auto-scaling-instances  # identify instance 
+
+aws autoscaling enter-standby --instance-ids i-5b73d709 --auto-scaling-group-name my-asg --should-decrement-desired-capacity  # descrease desired capacity not launch replacement instance
+
+aws autoscaling describe-auto-scaling-instance --instance-ids  i5b73d709  # verify instance 
+
+aws autoscaling exit-standby --instance-ids i5b73d709 --auto-scaling-group-name my-asg 
+
+aws cloudwatch list-metrics --namespace "AWS/AutoScaling"  #view all metrics
+
+#labmda log event 
+console.log('Loading function');
+
+exports.handler = function(event, context) {
+  console.log("AutoScalingEvent()");
+  console.log("Event data:\n" + JSON.stringify(event, null, 4));
+  context.succeed("...");
+};
+
+#verify auto scaling launched new instance 
+aws autoscaling describe-auto-scaling-groups --auto-scaling-group-name my-asg 
+
+#delete notification configuration
+aws autoscaling delete-notification-configuration --auto-scaling-group-name my-asg --topic-arn arn:aws:sns:us-west-2:123456789012:my-sns-topic
+
+# create launch configuration 
+aws autoscaling create-launch-configuration --launch-configuration-name my-lc-with-instance-profile \
+--image-id ami-baba68d3 --instance-type m1.small \
+--iam-instance-profile my-instance-profile 
+
+# retrieve error msg
+aws autoscaling describe-scaling-activities --auto-scaling-group-name my-asg 
+
+# create service-linked role by starting continuous export 
+aws discovery start-continuous-export
+
+# delete application discovery service resources
+aws discovery stop-continuous-export --export-id <export ID>
+
+# verify status
+aws discovery describe-continuous-export
+
+# start data collection
+aws discovery start-data-collection-by-agent-ids --agent-ids <connector ID>
+
+# find agent id
+aws discovery describe-agents --filters condition=EQUALS,name=hostname,values=connector
+
+#### amazon ecr user guide
+# create docker image 
+touch Dockerfile
+
+FROM ubuntu:12.04
+RUN apt-get update -y
+RUN apt-get install -y apache2
+RUN echo 'hello world" > /var/www/index.html
+RUN a2enmod rewrite
+RUN chown -R www-data:www-data /var/www
+ENV APACHE_RUN_USER www-data
+ENV APACHE_RUN_GROUP www-data
+EXPOSE 80
+CMD ["/usr/sbin/apache2", "-D", "FOREGROUND"]
+
+docker build -t hello-world .
+docker images --filter reference=hello-world
+docker run -p 80:80 hello-world
+
+#push to ecr
+aws ecr create-repository --repository-name hello-world
+docker tag hello-world aws_account_id.dkr.ecr.us-east-1.amazonaws.com/hello-world
+aws ecr get-login --no-include-email 
+docker push aws_account_id.dkr.ecr.us-east-1.amazonaws.com/hello-world
+aws ecr delete-repository --repository-name hello-world --force
+
+aws ecr get-login --no-include-email
+docker login -u AWS -p password https://aws_account_id.dkr.ecr.us-east-1.amazonaws.com
+
+# identify image to push
+docker images 
+docker tag e9ae3c220b23 aws_account_id.dkr.ecr.region.amazonaws.com/my-web-app
+docker push aws_account_id.dkr.ecr.region.amazonaws.com/my-web-app
+
+aws ecr describe-repositories
+aws ecr describe-images --repository-name amazonlinux
+docker pull aws_account_id.dkr.ecr.us-west-2.amazonaws.com/amazonlinux:laatest
+
+aws ecr list-images --repository-name my-repositories
+aws ecr batch-delete-image --repository-name my-repo  --image-ids imageTag=latest  # delete image 
+
+aws ecr batch-delete-image --repository-name my-repo --image-ids imageDigest=sha256:4f70ef8a4d20e9cc3b13e25073d0f704c7c1c1a-d6fa3e9debff552d
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

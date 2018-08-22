@@ -1,0 +1,58 @@
+29 July 2018
+
+mkdir ddb
+curl https://bootstrap.pypa.io/get-pip.py -o get-pip.py
+sudo python get-pip.py 
+sudo pip install Flask
+sudo pip install boto
+sudo pip install configparser 
+
+# download ddb 
+mv  ../../../Downloads/dynamodb_local_latest.tar.gz .
+gunzip dynamodb_local_latest.tar.gz 
+tar xvf dynamodb_local_latest.tar 
+
+# install jdk
+brew cask install java
+
+java -version
+java version "10.0.2" 2018-07-17
+Java(TM) SE Runtime Environment 18.3 (build 10.0.2+13)
+Java HotSpot(TM) 64-Bit Server VM 18.3 (build 10.0.2+13, mixed mode)
+
+# start ddb
+java -Djava.library.path=./DynamoDBLocal_lib -jar DynamoDBLocal.jar -sharedDb
+
+# install aws cli
+cd Documents/aws/ddb/
+pip3 install awscli --upgrade --user
+
+# upgrade below two packages to clear warning
+pip install nose --upgrade --user
+pip install tornado --upgrade  --user
+
+# update PATH
+vim ~/.bash_profile 
+PATH="~/Library/Python/2.7/bin:/Library/Frameworks/Python.framework/Versions/3.5/bin:${PATH}"
+
+source ~/.bash_profile
+aws --version
+ 
+# config aws 
+aws configure
+AWS Access Key ID [None]: fakeMyKeyId
+AWS Secret Access Key [None]: fakeSecretAccessKey
+Default region name [None]: us-west-2
+Default output format [None]: json
+
+# open console 
+http://localhost:8000/shell/
+
+# list table
+aws dynamodb list-tables --endpoint-url http://localhost:8000
+
+# js shell 
+http://localhost:8000/shell/
+
+# app url 
+http://localhost:8000/shell/image-tag-demo.html
