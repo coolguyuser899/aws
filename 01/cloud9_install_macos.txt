@@ -1,0 +1,36 @@
+
+# build code 
+git clone https://github.com/c9/core.git c9sdk
+cd c9sdk/
+./scripts/install-sdk.sh 
+
+sudo npm i -g npm
+
+# make sure node version is correct
+node -v     # must be version 10.1.0, code break at v10.6.0
+sudo npm cache clean -f
+sudo npm install -g n
+sudo n 10.1.0
+git reset --hard
+
+# start node 
+node server.js
+
+
+# The following options can be used:
+
+--settings       Settings file to use
+--help           Show command line options.
+-t               Start in test mode
+-k               Kill tmux server in test mode
+-b               Start the bridge server - to receive commands from the cli  [default: false]
+-w               Workspace directory
+--port           Port
+--debug          Turn debugging on
+--listen         IP address of the server
+--readonly       Run in read only mode
+--packed         Whether to use the packed version.
+--auth           Basic Auth username:password
+--collab         Whether to enable collab.
+--no-cache       Don't use the cached version of CSS
+

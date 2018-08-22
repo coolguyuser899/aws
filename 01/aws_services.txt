@@ -1,0 +1,193 @@
+review exam guide
+labs
+whitepapers
+faqs
+
+select standout words in questions
+
+
+https://aws.amazon.com/whitepapers/
+https://aws.amazon.com/resources/analyst-reports/
+
+
+
+asw regions and endpoins
+https://docs.aws.amazon.com/general/latest/gr/rande.html
+
+alexa for business  	a4b.us-east-1.amazonaws.com
+aws api gateway
+application auto scaling
+amazon appstream 2.0
+aws IoT 1-click
+aws IoT 1-click devices api
+aws appsync
+athena
+amazon aurora
+amazon aurora with postgresql compatibility
+aws auto scaliing
+amazon ec2 auto scaling
+aws batch
+aws billing and cost management
+    aws cost explorer   https://ce.us-east-1.amazonaws.com
+    aws budgets         https://budgets.us-east-1.amazonaws.com
+    aws price list services     api.pricing.us-east-1.amazonaws.com  (u.s.), api.pricing.ap-south-1.amazonaws.com (mumbai)
+aws certificate manager
+aws certificate manager private certificate authority
+aws cloud9
+amazon cloud directory
+aws cloudformation
+amazon cloudfront   single endpoint: cloudfront.amazonaws.com (only https)
+aws cloudhsm
+aws cloudhsm classic
+amazon cloudsearch
+aws cloudtrail
+aws cloudwatch
+aws cloudwatch events
+aws cloudwatch logs
+aws codebuild
+aws codecommit
+aws codedeploy
+aws codepipeline
+aws codestar
+amazon cognito identity
+    amazon cognito your user pools
+    amazon cognito federated identities
+amazon cognito sync
+amazon comprehend
+aws config
+aws comprehend
+aws config
+aws config rules
+aws connect
+aws data pipeline
+aws database migration services
+aws device farm     devicefarm.us-west-2.amazonaws.com https 
+amazon devpay   ls.amazonaws.com https
+aws direct connect
+aws directory service
+    aws direcotry service for microsoft active directory
+    AD connector
+    Simple AD
+amazon dynamoDB
+dynamodb accelerator (DAX)
+amazon dynamoDB streams
+aws elastic beanstalk
+aws elastic beanstalk health service
+amazon elastic compute cloud (amazon ec2)
+amazon elastic container registry
+amazon elastic container service
+amazon elastic container service for kubernetes (amazon eks)
+amazon elastic file system
+elastic load balancing
+amazon elastic transcoder
+amazon elasticcache
+amazon elasticsearch service
+amazon emr
+aws firewall manager 
+amazon gamelift
+amazon glacier
+aws glue
+aws greengrass
+amazon guardduty
+aws health  single endpoint: health.us-east-1.amazonaws.com (HTTPS).
+aws identity and access management (iam)    (single, cn, us-gov)
+aws import/export       importexport.amazonaws.com 	HTTPS
+amazon inspector
+aws IoT
+aws IoT analytics
+aws key management service
+amazon kinesis data analytics
+amazon kinesis data firehose
+amazon kinesis data streams
+amazon kinesis video streams
+aws lambda
+amazon lex
+    model building endpoins
+    runtime endpoins
+amazon lightsail
+amazon macie
+amazon machine learning
+aws elemental mediaconvert
+aws elemental medialive
+aws elemental mediapackaage
+aws elemental mediastore
+aws elemental mediatailor
+amazon mechanical turk  mturk-requester-sandbox.us-east-1.amazonaws.com 	
+mturk-requester.us-east-1.amazonaws.com
+aws migration hub
+amazon mobile analytics
+amazon mq
+aws opswork
+    aws opswork cm
+    asw opswork stacks
+aws organizations
+amazon pinpoint
+amazon polly
+amazon quicksight
+amazon redshift
+amazon rekognition
+amazon relational database service (amazon rds)
+aws resource groups
+aws route 53
+aws secrets manager
+aws server migration service
+amazon sagemaker
+aws security token service (aws sts)
+aws serverles application repository
+aws service catalog
+aws shield advanced      	shield.us-east-1.amazonaws.com. 	HTTPS
+amazon simple email service (amazon ses)
+amazon simple nofification service (amazon sns)
+amazon simple queue service (amazon sqs)
+    amazon sqs legacy endpoins
+amazon simple storage service (amazon s3)   dual-stack endpoints support requests to S3 buckets over IPv6 and IPv4
+    amazon simple storage service website endpoints
+amazon simple workflow service (amazon swf)
+amazon simpledb
+aws snowball
+aws step function   us-east-1 	states.us-east-1.amazonaws.com,example
+aws storage gateway
+aws support     single endpoint: support.us-east-1.amazonaws.com (HTTPS).
+aws system manager
+amazon transcribe
+amazon translate
+amazon vpc
+aws waf
+amazon workdocs
+amazon workmail
+amazon workspace
+aws x-ray
+
+
+
+
+
+
+	
+	
+	
+	
+	
+	
+	
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    
+
+
+

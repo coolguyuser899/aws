@@ -1,0 +1,13 @@
+
+kubectl get nodes 
+
+docker swarm init
+
+docker stack deploy --compose-file demo.yaml mystack
+
+Ignoring unsupported options: build
+
+Creating network mystack_default
+Creating service mystack_web
+Creating service mystack_words
+Creating service mystack_db
