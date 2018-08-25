@@ -377,6 +377,183 @@ A: https://arsenal.us-west-2.amazonaws.com/
 What is ecr?
 A: elastic container registry is docker registry service, developer can use to push, pull, and manage images.
 
+How to avoid -p password at docker login command?
+A: omit -p password at command line and use interactively
+
+#ECS
+What is container instance draining?
+A: enables you to remove a container instance froma cluset without impacting tasks in your cluster.
+
+Which file stores container instance configuration in s3?
+A: /etc/ecs/ecs.config 
+
+How to load ecs.config from s3 at launch?
+#!/bin/bash
+yum install -y aws-cli
+aws s3 cp s3://your_bucket_name/ecs.config /etc/ecs/ecs.config 
+
+What are launch types for ecs?
+A: Fargate launch type and ec2 launch type.
+
+What is bind mount?
+A: a file or direcdtory on the host machine is mounted into a container.
+
+What task networking provides at launch time?
+A: own elastic network interface, a priary private IP, an internal dns HOSTNAME.
+
+What are limites of awsvpc?
+A: 10 subnets and 5 security groups in awsvpcConfiguration section in task definition.
+
+What are difference between fargate and ec2 launch types?
+A: fargate allow you run containerized app without need to provision and manage backend infrastructure and launches container for you, ec2 launch type allow you to run on a cluster that you manage.
+
+What are benefits of using iam roles for tasks?
+A: credential isolation (not access to other task), authorization, auditability.
+
+#### Amazon EKS User Guide
+What is eks?
+A: Kubernetes is an open-source system for automating the deployment, scaling, and management of containerized applications.
+
+How eks works?
+A: 
+create eks cluster, 
+launch worker nodes that register eks cluster
+config tools kubectl to communicate to cluster
+deploy and manage application 
+
+What are worker machine in kubernetes called?
+A: nodes.
+
+What is calico?
+A: Project Calico is a network policy engine for Kubernetes, you can implement network segmentation and tenant isolation.
+
+#### AWS elastic beanstalk developer guide
+What is elastic beanstalk?
+A: quickly and manage applications in the aws without worrying about the infrastructure that runs those applications.
+
+By default where does elastic beanstalk terminates ssl encrption?
+A: it is terminated at load balancer, traffic between load balancer and ec2 is uncrypted.
+
+What two roles are needed when creating elastic beanstalk?
+A: a service role and an instance profile 
+
+What is dead letter queue and can you disable it?
+A: it is a queue where other queues can't be successfully processed, you can't disable it, but you can disable this feature by setting MaxRetries to max valid valud of 100.
+
+What is aws x-ray?
+A: it is aws service that gathers data that app serves,and uses it to construct a service map that you can use to identify issues and optimization.
+
+What file can be used to let eb cli to ignore files in project?
+A: .ebignore 
+
+How do you refresh interactive health view in eb health?
+A: eb health --refresh ## refresh every 10 seconds 
+
+How to deploy app from docker container to elastic beanstalk?
+A: create a Dockerfile to customize an image
+Create a Dockerrun.aws.json file to deploy from existing docker image
+Create a .zip file containing your application files, dependencies, Dockerfile, and Dockerrun.aws.json 
+
+What is aws sam?
+A: a fast and easy way of deploying serverless application, allowing you to write simple template to describe function and event sources.
+
+What are three types of application auto scaling?
+A: target tracking scaling, step scaling, scheduled scaling.
+
+#### aws cloudformation user guide
+Where does cloudformation template is saved?
+A: s3, and you will be charged.
+
+What are five elements when defining stack policy?
+A: Effect, Action, Principal, Resource, Condition
+
+What do you use when allow update actions except for one?
+A: use NoAction
+
+How do you modify stack policy? 
+A: you can't delete a stack policy, to remove all protection, explicitly allow all action on all resources.
+{
+    "Statement": [
+        "Effect": "Allow",
+        "Action": "Update:*",
+        "Principal": "*",
+        "Resource": "*",
+    ]
+}
+
+What are cloud formation intrinsic function?
+A: built-in functions to manage stack, used to assign values to properties that are not available until runtime.
+
+#### aws cloudtrail user guide
+How many days is cloudtrail log kept?
+A: 90 days.
+
+What are two types of trail?
+A: applies to all region, or applies to one region.
+
+What is a cloudtrail event?
+A: it is a record of an activity in an aws account.
+
+what is cloudtrail data event?
+A: also know as data plane operations, it provides insights into the resource operations performed on or in a resource.
+
+What is a trail?
+A: a trail is a configuration that enables delivery of cloudtrail events to an s3, cloudwatch, cloudwatch events.
+
+Which region is logged for global service events?
+A: They are logged as occurring in us east (n. virginia) region.
+
+#### amazon cloudwatch user guide
+How cloudwatch works?
+A: it is a metrics repository, and you retrieve statistics based on them.
+
+What is cloudwatch namespace?
+A: a namespace is a container for cloudwatch metrics.
+
+Can you delete cloudwatch metrics?
+A: Metrics cannot be deleted, but they automatically expires after 15 months.
+
+What is cloudwatch metric data retention policy?
+A: 
+data point < 60 seconds, available for 3 hours
+data point with 60 seconds (1min), available for 15 days
+data point with 300 seconds (5 mins), available for 63 days
+data point with 3600 deconds (1hr), availalbe 455 days (15 months)
+
+What is cloudwatch dimension?
+A: key/value pair uniquely identifies a metric, you can have 10 dimensions to a metric.
+
+What is regular alarm period?
+A: 60 seconds, with high-resolution of 10 or 30 seconds, you pay higher charge.
+
+What are metric resolution metrics?
+A: standard resolution, one minute granularity, high resolution, with granularity of one second 
+
+What is aws health api endpoint?
+A: https://health.us-east-1.amazonaws.com
+
+#### aws opsworks user guide
+How many sign-in attempts when use is locked out of Puppet Enterprise console?
+A: 10 times
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

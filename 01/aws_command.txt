@@ -139,3 +139,904 @@ configure                                | deploy
 configservice                            | opsworks-cm                             
 runtime.sagemaker                        | history                                 
 help
+
+
+
+
+# aws commands from guide
+aws autoscaling set-instance-protection --instance0-ids i-5f2e8a0d --auto-scaling-group-name my-asg --protected-from-scale-in  #enable instance protection
+
+aws autoscaling set-instance-protection --instance-ids i-5f2e8a0d --auto-scaling-group-name my-asg --no-protected-from-scale-in
+
+# create cloudwatch event rule
+aws events put-rule --name my-rule --event-pattern file://pattern.json  --state ENABLED
+pattern.json for launch lifecycle
+{
+  "source": [ "aws.autoscaling"],
+  "detail-type": [ "EC2 Instance-launch Lifecycle Action" ]
+}
+# pattern for terminate lifecycle
+{
+  "source": [ "aws.autoscaling" ],
+  "detail-type": [ "EC2 Instance-terminate Lifecycle Action"]
+}
+
+# grant rule permission to invoke lambda
+aws lambda add-permission --function-name LogScheduledEvent --statement-id my-scheduled-event --action 'lambda:InvokeFunction' --principal events.amazonaws.com  --source-arn  arn:aws:events:us-east-1:123456789012:rule/my-scheduled-rule
+
+# create a target that invokes lambda
+aws events put-targets --rule my-rule --targets Id=1,Arn=arn:aws:lambda:us-west-2:123456789012:function:my-function
+
+aws autoscaling describe-auto-scaling-instances  # identify instance 
+
+aws autoscaling enter-standby --instance-ids i-5b73d709 --auto-scaling-group-name my-asg --should-decrement-desired-capacity  # descrease desired capacity not launch replacement instance
+
+aws autoscaling describe-auto-scaling-instance --instance-ids  i5b73d709  # verify instance 
+
+aws autoscaling exit-standby --instance-ids i5b73d709 --auto-scaling-group-name my-asg 
+
+aws cloudwatch list-metrics --namespace "AWS/AutoScaling"  #view all metrics
+
+#labmda log event 
+console.log('Loading function');
+
+exports.handler = function(event, context) {
+  console.log("AutoScalingEvent()");
+  console.log("Event data:\n" + JSON.stringify(event, null, 4));
+  context.succeed("...");
+};
+
+#verify auto scaling launched new instance 
+aws autoscaling describe-auto-scaling-groups --auto-scaling-group-name my-asg 
+
+#delete notification configuration
+aws autoscaling delete-notification-configuration --auto-scaling-group-name my-asg --topic-arn arn:aws:sns:us-west-2:123456789012:my-sns-topic
+
+# create launch configuration 
+aws autoscaling create-launch-configuration --launch-configuration-name my-lc-with-instance-profile \
+--image-id ami-baba68d3 --instance-type m1.small \
+--iam-instance-profile my-instance-profile 
+
+# retrieve error msg
+aws autoscaling describe-scaling-activities --auto-scaling-group-name my-asg 
+
+# create service-linked role by starting continuous export 
+aws discovery start-continuous-export
+
+# delete application discovery service resources
+aws discovery stop-continuous-export --export-id <export ID>
+
+# verify status
+aws discovery describe-continuous-export
+
+# start data collection
+aws discovery start-data-collection-by-agent-ids --agent-ids <connector ID>
+
+# find agent id
+aws discovery describe-agents --filters condition=EQUALS,name=hostname,values=connector
+
+#### amazon ecr user guide
+# create docker image 
+touch Dockerfile
+
+FROM ubuntu:12.04
+RUN apt-get update -y
+RUN apt-get install -y apache2
+RUN echo 'hello world" > /var/www/index.html
+RUN a2enmod rewrite
+RUN chown -R www-data:www-data /var/www
+ENV APACHE_RUN_USER www-data
+ENV APACHE_RUN_GROUP www-data
+EXPOSE 80
+CMD ["/usr/sbin/apache2", "-D", "FOREGROUND"]
+
+docker build -t hello-world .
+docker images --filter reference=hello-world
+docker run -p 80:80 hello-world
+
+#push to ecr
+aws ecr create-repository --repository-name hello-world
+docker tag hello-world aws_account_id.dkr.ecr.us-east-1.amazonaws.com/hello-world
+aws ecr get-login --no-include-email 
+docker push aws_account_id.dkr.ecr.us-east-1.amazonaws.com/hello-world
+aws ecr delete-repository --repository-name hello-world --force
+
+aws ecr get-login --no-include-email
+docker login -u AWS -p password https://aws_account_id.dkr.ecr.us-east-1.amazonaws.com
+
+# identify image to push
+docker images 
+docker tag e9ae3c220b23 aws_account_id.dkr.ecr.region.amazonaws.com/my-web-app
+docker push aws_account_id.dkr.ecr.region.amazonaws.com/my-web-app
+
+aws ecr describe-repositories
+aws ecr describe-images --repository-name amazonlinux
+docker pull aws_account_id.dkr.ecr.us-west-2.amazonaws.com/amazonlinux:laatest
+
+aws ecr list-images --repository-name my-repositories
+aws ecr batch-delete-image --repository-name my-repo  --image-ids imageTag=latest  # delete image 
+
+aws ecr batch-delete-image --repository-name my-repo --image-ids imageDigest=sha256:4f70ef8a4d20e9cc3b13e25073d0f704c7c1c1a-d6fa3e9debff552d
+
+# pull container image 
+aws ecr get-login --region us-west-2 --registry-ida 137112412999 --no-include-email
+
+# list image
+aws ecr list-images --region us-wets-2 --registry-id 137112412989 --repository-name amazonlinux 
+
+#pull docker image
+docker pull 137112412989.dkr.ecr.us-west-2.amazonaws.com/amazonlinux:latest
+
+# run docker locally
+docker run -it 137112412989.dkr.ecr.us-west-2.amazonaws.com/amazonlinux:latest  /bin/bash
+
+docker pull amazonlinux
+docker run -it amazonlinux:latest /bin/bash
+
+# describe repository
+aws ecr describe-repositories
+
+# create lifecycle policy
+aws ecr put-lifecycle-policy [--registry-id <string>] --repositor-name <string> --policy-text <string>
+
+# iam  policy json document
+{
+  "Statement": [{
+    "Effect":"effect",
+    "Action":"action",
+    "Resource":"arn",
+    "Condition":{
+      "condition":{
+        "key":"value"}
+      }
+  }]
+}
+
+#arm syntax
+arn:aws:[service]:[region]:[account]:resourceType/resourcePath
+"Resource": arn:aws.ecr:us-east-1:123456789012:repository/my-repo
+"Resource": "*"   #all resources
+
+# get docker image
+docker pull ubuntu:trusty
+
+#create repo
+aws ecr create-repository --repository-name ubuntu
+
+#list image
+docker images
+
+#tag image
+docker tag ubuntu:trusty aws_account_id.dkr.ecr.us-east-1.amazonaws.com/ubuntu.trusty
+
+#push image
+docker push aws_account_id.dkr.ecr.us-east-1.amazonaws.com/ubuntu:trusty
+
+#pull image
+docker pull aws_account_id.dkr.ecr.us-east-1.amazonnaws.com/ubuntu:trusty
+
+#delete image
+aws ecr batch-delete-image --repository-name ubuntu --image-ide imageTag=trusty
+
+#delete repository
+aws ecr delete-repository --repository-name ubuntu --force
+
+#install docker
+sudo yum update -y
+sudo yum install -y docker 
+sudo service docker start
+sudo usermod -a -G docker ec2-user
+docker info
+
+touch Dockerfile
+docker build -t hello-world .
+docker images --filter reference=hello-world # verify
+docker run -p 80:80  hello-world
+docker-machine ip machine-name  #
+
+aws ecr create-repository --repository-name hello-world
+docker tag hello-world aws_account_id.dkr.ecr.us-east-1.amazonaws.com/hello-world
+aws ecr get-login --no-include-email   # get docker login auth cmd string 
+docker push aws_account_id.dkr.ecr.us-east-1.amazonaws.com/hello-world
+
+aws ecr register-task-definition --cli-input-json file://hello-world-task-def.json
+aws ecr run-task --task-definition hello-world
+
+#ecs clean up, scale down to 0 first
+aws ecs update-service --cluster default --service service-name --desired-count 0 --region us-west-2
+aws ecs delete-service --cluster default --service service_name --region us-west-2
+
+#de-register container instance
+aws ecs deregister-container-instance --cluster default --container-instance container_instance_id  --region us-west-2  --force
+
+# delete cluster
+aws ecs delete-cluster --cluster default --region us-west-2
+
+# retrieve metadata of the latest stable ecs-optimized ami
+aws ssm get-parameters --names /aws/service/ecs/optimized-ami/amazon-linux/recommended --region us-east-1
+
+
+# determine storage for docker
+sudo vgs   # volume group space
+sudo lvs  # logical volume
+docker info | grep "Data Space"
+
+# remove non-running containers
+docker rm $(docker ps -aq)
+
+#remove unused images
+docker rmi $(docker images -a)
+
+#remove unused data blocks within container
+sudo sh -c "docker ps -q |xargs docker inspect --format='{{ .State.Pid }}' | xargs -IZ fstrim /proc/Z/root"
+
+#diff every git commit against its parent
+git log --format="%H %P" | xargs -L 1 git diff 
+
+# check docker-pool logical volume
+sudo lvs
+
+# check available space in volume group 
+sudo vgs
+
+# add new volume to docker volume group
+sudo vgextend docker /dev/xvdcy
+
+# extend docker-pool logical volume
+sudo lvextend -L+1024G /dev/docker/docker-pool
+sudo lvs
+docker info |grep "Data Space"
+
+# subscribe to ami update notification emails 
+aws sns --region us-west-2 subscribe --topic --topic-arn arn:aws:sns:us-west-2:177427601217:ecs-optimized-amazon-ami-update --protocol email --notification-endpoint your_email@your_domain.com
+
+# retrieve ecs-optimized ami 
+aws ssm get-parameters --name /aws/service/ecs/optimized-ami/amazon-linux/recommended
+
+# set only single agent configuration variable
+#!/bin/bash
+echo "ECS_CLUSTER=MyCluster" >> /etc/ecs/ecs.configservice
+
+# set multiple variable use heredoc format
+#!/bin/bash
+cat <<'EOF' >> /etc/ecs/ecs.config
+ECS_CLUSTER=MyCluster
+ECS_ENGINE_AUTH_TYPE=docker
+ECS_ENGINE_AUTH_DATA={"https://index.docker.io/v1/":{"username":"my_name","password":"my_password","email":"email@example.com"}}
+ECS_LOGLEVEL=debug
+EOF
+
+#  cloud-init-per utility used to prevent boothook running multiple times
+cloud-init-per once docker_options echo 'OPTIONS="${OPTIONS} --storage-opt dm.basesize=20GB"' >> /etc/sysconfig/docker
+
+# cloud-init-per multiple lines
+cloud-init-per instance docker_options cat <<'EOF' >> /etc/sysconfig/docker
+OPTIONS="{OPTIONS} --storage-option dm.baseline=http://proxy.example.com:80/
+EOF
+
+# cloud-init-per utility cmd 
+cloud-init-per frequency name cmd [ args1 [ args2 [ ... ] ]
+
+# semaphore file records cloud-init-per exit code and timestamp
+cloud-init-per once docker_options echo 'OPTIONS="${OPTIONS} --storage-opt dm.basesize=20G"' >> /etc/sysconfig/docker
+cat /var/lib/cloud/instances/i-0c7f8d77611b2165e/sem bootper.docker_options.instance
+0 1488410363
+
+# connect to ec2 via ssh
+ssh -i /path/to/my-key-pair.pem ec2-user@ec2-198-51-100-1.compute1.amazonaws.com
+
+# create ecs-cloudwatchlogs iam policy
+{
+  "Version": "2012-10-17",
+  "Statement": "[
+      {
+        "Effect": "Allow",
+        "Action": [
+          "logs:CreateLogGroup",
+          "logs:CreateLogStream",
+          "logs:PutLogEvents",
+          "logs:DescribeLogStream"
+        ],
+        "Resource": [
+          "arn:aws:logs:*:*:*"
+        ]
+      }
+  ]
+}
+
+# install cloudwatch logs agent
+sudo yum install -y awslogs
+sudo service awslog start
+sudo chkconfig awslogs on 
+
+# install json query utility
+sudo yum install -y jq
+
+cluster=$(curl -s  http://localhost:51678/v1/metadata | jq -r '. | .Cluster')
+# replace {cluster} placeholders with above variable 
+sudo sed -i -e "s/{cluster}/$cluster/g" /etc/awslogs/awslogs.conf 
+
+#find conatiner instance id 
+container_instance_id=$(curl -s http://localhost:51678/v1/metadata | jq -r '. | .ContainerInstanceArn' | awk -F / '{print $2}' )
+#replace container instance id placeholders
+sudo sed -i -e "s/{container_instance_id}/$container_instance_id/g" /etc/awslogs/awslogs.conf 
+
+# determine linux total memory 
+free -b 
+
+# install ecs container agent 
+sudo docker version # check minimum version requirement 
+sudo yum install -y ecs-init
+sudo service docker start
+sudo start ecs 
+curl http://localhost:51678/v1/metadata
+
+# create /etc/ecs directory and create agent config file
+sudo mkdir -p /etc/ecs && sudo touch /etc/ecs/ecs.config 
+
+# download ecs container agent tarball
+curl -o ecs-agent.tar http://s3.amazonaws.com/amazon-ecs-agent-us-east-1/ecs-agent-latest.tar
+sudo docker load --input ./ecs-agent.tar   # load
+sudo docker run --name ecs agent \  # run agent image
+--detach=true \
+--restart=on-failure:10 \
+--volume=/var/run:var/run \
+--volume=/var/log/ecs/:/log \
+--volume=/var/lib/ecs/data:/data \
+--volume=/etc/ecs:/etc/ecs \
+--net=host \
+--env-file=/etc/ecs/ecs.config \
+amazon/amazon-ecs-agent:latest
+
+# verify ecs container agent 
+gpg --keyserver hkp://keys.gnupg.net --recv BCE9DA42D51784F  # amazon ecs pgp public key
+gpg --import <public_key_filename>
+# download ecs container agent signature
+curl -o ecs-agent.asc http://s3.amazonaws.com/amazon-ecs-agent-us-east-1/ecs-agent-latest.tar.asc
+gpg --verify ecs-agent.asc ./ecs-agent.tar   # verify signature 
+
+#check if ecs container agent running latest version using introspection apigateway
+curl -s 127.0.0.1:51678/v1/metadata  | python -mjson.tool 
+
+#enable ecs private registry
+sudo vi /etc/ecs/ecs.config
+docker inspect ecs-agent | grep ECS_DATADIR
+sudo stop ecs
+sudo start ecs
+curl http://localhost:51678/v1/metadata
+
+#generate task definition template 
+aws ecs register-task-definition --generaate-cli-skeleton
+
+#create sesrvice linked role to allow awsvpc 
+aws iam create-service-linked-role --aws-service-name ecs.amazonaws.com
+
+#create log group
+aws logs create-log-group --log-group-name awslogs-wordpress --region us-west-2
+
+#ecs add attribute
+aws ecs put-attributes --attributes name=stack,value=prod,targetId=arn
+aws ecs put-attributes --atrributes name=stack,value=prod,targetId=arn  name=project,value=a,targetId=arn
+
+#ecs filter attributes 
+aws ecs list-container-instances --filter "attribute:ecs.instance-type == g2.2xlarge"  #built-in attribute
+aws ecs list-container-instances --filter "attribute:stack == prod"   #custom attribute
+
+#create the scheduled task 
+aws events put-rule --schedule-expression "cron(0 12 * * ? *)" --name myRule1  #create cloudwatch event rule 
+#add target for event rule
+aws events put-targets --rule "MyRule1" --targets "Id"="1","Arn"="arn:aws:ecs:us-east-1:123456789012:cluster/default","RoleArn"="arn:aws:iam::123456789012:role/ecsEventsRole","EcsParameters"="{"TaskDefinitionArn"="arn:aws:ecs:us-east-1:123456789012:task-definition/first-run-task-definition:1","TaskCount"=1}"
+
+#create definition template
+aws ecs create-service --generate-cli-skeleton
+
+#use apachebench ab utility to make thousands of http request to local balander 
+sudo yum install -y httpd24-tools
+ab -n 100000 -c 1000 http://EC2Contai-EcsElast-SMAKV74U23PH-96652279.us-east-1.elb.amazonaws.com/
+
+#create service discovery namespace and service
+aws servicdiscovery create-private-dns-namespace --name tutorial --vpc vpc-abcd1234 --region us-easat-1
+#verify namespace created
+aws servicediscovery get-operation --operation-id h2qe3s6dxftvvt7rius6lfy2f6c3jlhf4-je6chs2e
+#create service 
+aws servicediscovery create-service --name myapplication --dns-config 'NamespaceId="ns-uejictsjen2i4eeg",DnsRecords=[{Type="A",TTL="300'}]' --health-check-custom-config FailureThreshold=1  --region us-east-1
+#create a cluster
+aws ecs create-cluster --cluster-name tutorial --region us-east-1
+# register a task definition
+aws ecs register-task-definition --cli-input-json file://fargate-task.json --region us-east-1
+#create a service 
+aws ecs create-service --cli-input-json file://ecs-service-discovery.json --region=us-east-1
+# verify service 
+aws servicediscovery list-instances --service-id srv-utcrh6wavdkggqtk --region us-east-1
+aws route53 list-resource-record-sets --hosted-zone-id Z35JQ4ZFDRYPLV --region us-east-1  
+# deregister the service discovery
+aws servicediscovery deregister-instance --service-id srv-utcrh6wavdkggqtk --instannce-id 16becc26-8558-4af1-9fbd-f81be062a266 --region us-east-1
+# verify deresigteration 
+aws servicediscovery get-option --poeration-id xhu73bsertlyffhm3faqi7kumsmx274n=jh0zimzv --region us-east-1
+# delete service discovery service 
+aws servicediscovery delete-service --id srv-utcrh6wavdkggqtk --region us-east-1
+# delete service discovery namespace
+aws servicediscovery delete-namespace --id us-eujictsjen2i4eeg --region us-east-1
+# update desired count = 0
+aws ecs update-service --cluster tutorial --service ecs-service-discovery --desired-count 0 --force-new-deployment --region us-east-1
+# delete ecs service 
+aws ecs delete-service --cluster tutorial --service ecs-service-discovery --region us-east-1
+# delete ecs cluster 
+aws ecs delete-cluster --cluster tutorail --region us-east-1
+
+#lambda function to listen ecs event python 2.7
+import json 
+def lambda_handler(event, contextt):
+  if event["source"] != "aws.ecs":
+    raise ValueError("Function only supports input from events with a source type of: aws.ecs")
+  
+  print('Here is the event')
+  print(json.dumps(event))
+  
+
+#create task execiton iam role
+{
+  "Version": "2012-10-17",
+  "Statement":[
+    {
+      "Sid": "",
+      "Effect": "Allow",
+      "Principal": {
+        "Service": "ecs-tasks.amazonaws.com"
+      },
+      "Action": "sts.AssumeRole"
+    }
+  ]
+}
+
+#create task execution role
+aws iam --region us-east-1 create-role --role-name ecsTaskExecutionRole --assume-role-policy-document file://task-execution-assume-role.json
+#attach role policy
+aws iam --region us-east-1 attach-role-policy --role-name ecsTaskExecutionRole --polic-arn arn:aws:iam::aws::policy/service-role/AmazonECSTaskExecutionRolePolicy
+#create ecs cli configuration 
+ecs-cli configure --cluster tutorial --region us-east-1  --default-launch-type FARGATE  --config-name tutorial
+# create a cli profile
+ecs-cli configure profile --access-key AWS_ACCESS_KEY_ID --secret-key AWS_SECRET_ACCESS_KEY --profile-name tutorial
+# create cluster 
+ecs-cli up
+#create security group
+aws ec2 create-security-group --group-name "my-sg" --description "My security group" --vpc-id "VPC_ID"
+#add inbound rule on port 80
+aws ec2 authorize-security-group-ingress --group-id "security_group_id"  --protocol tcp --port 80 --cidr 0.0.0.0/0
+#deploy compose file
+ecs-cli compose --projec-name tutorail service up --create-log-groups  --cluster-config tutorial
+#view running container
+ecs-cli compose --project-name tutorial service ps --cluster-config tutorial 
+#scale cluster
+ecs-cli compose --project-name tutorial service ps --cluster-config tutorial 
+#clean up
+ecs-cli compose --project-name tutorial service down  --cluster-config tutorial  #delete service 
+ecs-cli down --force --cluster-config tutorial  # take down cluster 
+
+##Amazon EKS user guide
+# install kubectl
+curl -o kubectl https://amazon-eks.s3-us-west-2.amazonaws.com/1.10.3/2018-07-26/bin/darwin/amd64/kubectl
+#verify
+curl -o kubectl.sha256 https://amazon-eks.s3-us-west-2.amazonaws.com/1.10.3/2018-07-26/bin/darwin/amd64/kubectl.sha256
+openssl sha -sha256 kubectl   # two results should match
+chmod +x ./kubectl
+cp ./kubectl $HOME/bin/kubectl && export PATH=$HOME/bin:$PATH
+echo 'export PATH=$HOME/bin:$PATH' >> ~/.bash_profile
+
+#check kubectl version
+kubectl version --short --client 
+
+#install aws-iam-authenticator 
+curl -o aws-iam-authenticator https://amazon-eks.s3-us-west-2.amazonaws.com/1.10.3/2018-07-26/bin/darwin/amd64/aws-iam-authenticator
+chmod +x ./aws-iam-authenticator
+aws-iam-authenticator help
+
+#use go get install aws-iam-authenticator 
+go get -u -v github.com/kubernetes-sigs/aws-iam-authenticator/cmd/aws-iam-authenticator
+
+#check aws credential
+aws sts get-caller-identity
+# retrieve eks endpoint
+aws eks describe-cluster --name devel --query cluster.endpoint
+
+#create kubeconfig 
+mkdir -p ~/.kube 
+export KUBECONFIG=$KUBECONFIG:~/.kube.config-devel
+
+#test eks config
+kubectl get svc
+
+#launch and config eks worker nodes
+#download template
+https://amazon-eks.s3-us-west-2.amazonaws.com/1.10.3/2018-07-26/amazon-eks-nodegroup.yaml
+#down configuration map
+curl -O https://amazon-eks.s3-us-west-2.amazonaws.com/1.10.3/2018-07-26/aws-auth-cm.yaml
+#apply config 
+kubectl apply -f aws-auth-cm.yaml
+#watch nodes to ready Ready status 
+kubectl get nodes --watch
+
+# yaml file parser https://stackoverflow.com/questions/5014632/how-can-i-parse-a-yaml-file-from-a-linux-shell-script
+function parse_yaml {
+   local prefix=$2
+   local s='[[:space:]]*' w='[a-zA-Z0-9_]*' fs=$(echo @|tr @ '\034')
+   sed -ne "s|,$s\]$s\$|]|" \
+        -e ":1;s|^\($s\)\($w\)$s:$s\[$s\(.*\)$s,$s\(.*\)$s\]|\1\2: [\3]\n\1  - \4|;t1" \
+        -e "s|^\($s\)\($w\)$s:$s\[$s\(.*\)$s\]|\1\2:\n\1  - \3|;p" $1 | \
+   sed -ne "s|,$s}$s\$|}|" \
+        -e ":1;s|^\($s\)-$s{$s\(.*\)$s,$s\($w\)$s:$s\(.*\)$s}|\1- {\2}\n\1  \3: \4|;t1" \
+        -e    "s|^\($s\)-$s{$s\(.*\)$s}|\1-\n\1  \2|;p" | \
+   sed -ne "s|^\($s\):|\1|" \
+        -e "s|^\($s\)-$s[\"']\(.*\)[\"']$s\$|\1$fs$fs\2|p" \
+        -e "s|^\($s\)-$s\(.*\)$s\$|\1$fs$fs\2|p" \
+        -e "s|^\($s\)\($w\)$s:$s[\"']\(.*\)[\"']$s\$|\1$fs\2$fs\3|p" \
+        -e "s|^\($s\)\($w\)$s:$s\(.*\)$s\$|\1$fs\2$fs\3|p" | \
+   awk -F$fs '{
+      indent = length($1)/2;
+      vname[indent] = $2;
+      for (i in vname) {if (i > indent) {delete vname[i]; idx[i]=0}}
+      if(length($2)== 0){  vname[indent]= ++idx[indent] };
+      if (length($3) > 0) {
+         vn=""; for (i=0; i<indent; i++) { vn=(vn)(vname[i])("_")}
+         printf("%s%s%s=\"%s\"\n", "'$prefix'",vn, vname[indent], $3);
+      }
+   }'
+}
+
+parse_yaml sample.yml #
+
+#### elastic beanstalk
+# create source bundle with git
+git archive -v -o myapp.zip --format=zip HEAD # git archive only includes files stored, exclude git files
+
+#getting started with eb
+git init .   #  you can use git to deploy application quickly and easily
+eb init   # config eb 
+eb start  # create application 
+eb status --verbose  # view app 
+# update sample app
+git add index.php
+git commit -m "intial check-in"
+eb push   # deploy to eb 
+# clean up
+eb stop 
+eb delete 
+
+# eb deploy git branch to specific env 
+eb --version 
+git checkout prod 
+eb branch 
+
+# run docker env locally with eb cli
+sudo usermod -a -G docker $USER
+docker ps 
+eb local run 
+eb local run --port 8080
+eb local run --reverse RDS_HOST=$RDS_HOST,RDS_DB=$RDS_DB,RDS_USER=$RDS_USER,RDS_PASS=$RDS_PASS
+eb local status 
+docer ps 
+eb local open 
+eb local logs 
+#clean up 
+docker ps --all
+docker images 
+docker rm 75d515d99d2a  7061c76220de
+docker rmi 68bc5150cffc  637db2f5fb5   # remove image 
+
+# deploy go app to eb 
+go build -o bin/application application.go #provide source bundle 
+mkdir eb-go-sample
+cd eb-go-sample 
+docker build -t my-app-image .
+docker run -it --rm -p 8080:3000 my-app-image 
+
+# set up python virtual em with django 
+virtualenv ~/eb-virt  # create virtual env 
+source ~/eb-virt/bin/activate  #activate virtual env 
+pip install django==1.9.12   #install 
+pip freeze    # verify django is installed  
+# create django project
+source ~/eb-virt/bin/activate 
+django-admin startproject ebdjango 
+cd ebdjango
+python manage.py runserver # open http:/127.0.0.1:8000/
+
+# deploy with eb cli 
+eb init -p python-2.7 django-tutorial
+eb init 
+eb create django-env 
+eb status 
+eb deploy 
+eb open 
+#clean up 
+eb terminate django-env 
+rm -rf ~/eb-virt
+rm -rf ~/ebdjango
+
+#### VPC user guide
+aws ec2 create-vpc --cidr-block 10.0.0.0/16
+aws ec2 create-subnet --vpc-id vpc-2f09a348  --cidr-block 10.0.1.0/24
+aws ec2 create-subnet --vpc-id vpc-2f09a348  --cidr-block 10.0.0.0/24
+aws ec2 create-internet-gateway
+aws ec2 attach-internet-gateway --vpc-id vpc-2f09a348  --internet-gateway-id igw-1ff7a07b
+aws ec2 create-route-table --vpc-id vpc-2f09a348
+aws ec2 create-route --route-table-id rtb-c1c8faa6 --destination-cidr-block 0.0.0.0/0 --gateway-id igw-1ff7a07b
+aws ec2 describe-route-table --route-table-id rtb-c1c8faa6
+aws ec2 describe-subnets --filters "Name=vpc-id,Values=vpc-2f09a348" --query 'Subnets[*].{ID:SubnetId,CIDR:CidrBlock}'
+aws ec2 associate-route-table --subnet-id subnet-b46032ec --route-table-id rtb-c1c8faa6
+aws ec2 modify-subnet-attribute --subnet-id subnet-b46032ec --map-public-ip-on-launch 
+aws ec2 create-key-pair --key-name MyKeyPair --query 'KeyMaterial' --output text > MyKeyPair.pem
+chmod 400 MyKeyPair.pem
+aws ec2 create-security-group --group-name SSHAccess --description "Security group for SSH access" --vpc-id vpc-2f-0a348
+aws ec2 authorize-security-group-ingress --group-id sg-e1fb8c9a --protocol tcp --port 22 --cidr 0.0.0.0/0
+aws ec2 describe-instance --instance-id i-0146854b7443af453
+ssh -i "MyKeyPair.pem" ec2-user@52.87.168.235
+#clean up 
+aws ec2 delete-security-group --group-id sg-e1fb8c9a
+aws ec2 delete-subnet --subnet-id subnet-b46032ec
+aws ec2 delete-subnet --subnet-id subnet-a46032fc
+aws ec2 delete-route-table --route-table-id rtb-c1c8faa6
+aws ec2 detach-internet-gateway --internet-gateway-id igw-1ff7a07b  --vpc-id vpc-2f09a348
+aws ec2 delete-internet-gateway --internet-gateway-id igw-1ff7a07b
+aws ec2 delete-vpc --vpc-id vpc-2f09a348
+
+#### aws cloudformation user guide
+aws cloudformation list-stacks --stack-status-filter CREATE_COMPLETE
+aws cloudformation describe-stacks --stack-name myteststack
+aws cloudformation create-stack --stack-name myteststack --template-body file:///home/local/test/sampletemplate.json 
+aws cloudformation describe-stack-events --stack-name myteststack 
+aws cloudformation --list-stack-resources --stack-name myteststack 
+aws cloudformation get-template --stack-name myteststack  # for up to 90 days after stack is deleted
+aws cloudformation validate-template --template-url  https://s3.amazonws.com/cloudformation-template-us-east-1/S3_Bucket.template 
+aws cloudformation validate-template --template-body file://home/local/test/sampletemplate.json
+aws cloudformation package --template /path_to_template/template.json --s3-bucket mybucket --output json > packaged-template.json 
+aws cloudformation deploy --template /path_to_template/my_template.json --stack-name my-new-stack --parameter-overrides Key1=Value1 Key2=Value2
+aws cloudformation delete-stack --stack-name myteststack
+
+aws cloudformation create-change-set --stack-name arn:aws:cloudformation:us-east-1:123456789012:stack/SampleStack/1a2345b6-0000-00a0-a123-00abc0abc000 --change-set-name SampleChangeSet --user-previous-template --parameters ParameterKey="InstanceType",UsePreviousValue=true ParameterKey="KeyPairName",UsePreviousValue=true ParameterKey="Purpose",ParameterValue=-"production"
+aws cloudformation list-change-set --stack-name arn:aws:cloudformation:us-east-1:123456789012:stack/SampleStack/1a2345b6-0000-00a0-a123-00abc0abc000
+aws cloudformation describe-change-set --change-set-name arn:aws:cloudformation:us-east-1:123456789012:stack/SampleStack/1a2345b6-0000-00a0-a123-00abc0abc000
+aws cloudformation execute-change-set --change-set-name arn:aws:cloudformation:us-east-1:123456789012:stack/SampleStack/1a2345b6-0000-00a0-a123-00abc0abc000
+aws cloudformation delete-change-set --change-set-name arn:aws:cloudformation:us-east-1:123456789012:stack/SampleStack/1a2345b6-0000-00a0-a123-00abc0abc000
+aws cloudformation update-stack --stack-name mystack --template-url https://s3.amazonaws.com/sample/updated.template --parameters ParameterKey=VPCID
+#get root stack operable state use continue-update-rollback, use resources-to-skip to skip resource failed to rollback 
+aws cloudformation continue-update-rollback --stack-name WebInfra --resource-to-skip myCustom WebInfra-Compute-Asg.myAsg WebInfra-Compute-LB.myLoadBalancer WebInfra-Storage.DB
+
+#### aws cloudtrail user guide
+aws cloudtrail lookup-events help 
+aws cloudtrail lookup-events
+aws cloudtrail lookup-events --max-results <integer>
+aws cloudtrail lookup-events --max-results 1 
+aws cloudtrail lookup-events --start-time <timestamp> --end-time <timestamp>
+aws cloudtrail lookup-events --lookup-attributes AttributeKey=<attribute>,AttributeKey=<string>
+#generate input template 
+aws cloudtrail lookup-events --generate-cli-skeleton > LookupEvents.txt
+aws cloudtrail lookup-events --cli-input-json file://LookupEvents.txt 
+
+aws cloudtrail create-trail --name my-trail --s3-bucket-name my-bucket 
+aws cloudtrail start-logging --name my-trail
+aws cloudtrail get-trail-status --name my-trail 
+aws cloudtrail create-trail --name my-trail --s3-bucket-name my-bucket --is-multi-region-trail 
+aws cloudtrail create-trail --name my-trail --s3-bucket-name my-bucket --is-multi-region-trail --enable-log-file-validation
+aws cloudtrail update-trail --name my-trail --is-multi-region-trail 
+aws cloudtrail update-trail --name my-trail --no-is-multi-region-trail 
+aws cloudtrail update-trail --name my-trail --no=include-globl-service-events
+aws cloudtrail update-trail --name my-trail --enable-log-file-validation
+aws cloudtrail update-trail --name my-trail --no-enable-log-file-validation
+aws cloudtrail create-subscription --name=awscloudtrail-example --s3-new-bucket=awscloudtrail-new-bucket-example --s3-prefix=prefix-example --sns-new-topic=awscloudtrail-example-log-deliverytopic 
+aws cloudtrail update-subscription --name=awscloudtrail-example --s3-use-bucket=awscloudtrail-new-bucket-example2 --s3-prefix=prefix-example 
+aws cloudtrail describe-trails 
+aws cloudtrail get-trail-status --name awscloudtrail-example 
+aws cloudtrail get-event-selectors --trail-name TrailName
+aws cloudtrail put-event-selector --trail-name TrailName2 --event-selectors '[{"ReadWriteType": "All","IncludeManagementEvents":true,"DataResources":[{"Type":"AWS"::S3::Object", "Values": ["arn:aws:s3:::"]},{"Type":[{"Type":"AWS"::Lambda::Function","Value":["arn:aws:lambda"]}]}]'
+aws cloudtrail start-logging --name awscloudtrail-example
+aws cloudtrail stop-stopping --name awscloudtrail-example 
+aws cloudtrail delete-trail --name awscloudtrail-example 
+
+
+#### amazon cloudwatch user guide
+aws cloudwatch list-metrics --namespace AWS/EC2 --dimensions Name=InstanceId,Value=i-1234567890abcdef0
+aws cloudwatch list-metrics --namespace AWS/EC2 --metric-name CPUUtilization
+
+#### bash strict mode 
+#http://redsymbol.net/articles/unofficial-bash-strict-mode/
+
+#!/bin/bash
+set -euo pipefail  #  -e exit at non zero, 
+IFS=$'\n\t'
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
